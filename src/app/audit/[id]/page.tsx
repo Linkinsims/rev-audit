@@ -22,6 +22,8 @@ interface AuditDetail {
 
 export default function AuditDetailPage() {
   const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const router = useRouter();
   const params = useParams();
   const [detail, setDetail] = useState<AuditDetail | null>(null);

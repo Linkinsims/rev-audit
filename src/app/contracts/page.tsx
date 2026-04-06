@@ -14,6 +14,8 @@ interface ContractRule { id: string; contractId: string; type: string; name: str
 
 export default function ContractsPage() {
   const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);

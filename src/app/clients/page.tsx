@@ -17,6 +17,8 @@ interface Client {
 
 export default function ClientsPage() {
   const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,16 +29,16 @@ export default function ClientsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (!mounted) return;
     if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, [status, router]);
+  }, [mounted, status, router]);
 
   useEffect(() => {
-    if (session) {
-      fetchClients();
-    }
-  }, [session, status]);
+    if (!mounted || !session) return;
+    fetchClients();
+  }, [mounted, session, status]);
 
   const fetchClients = async () => {
     if (status !== "authenticated") return;
@@ -81,7 +83,7 @@ export default function ClientsPage() {
 
   const filteredClients = clients.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
 
-  if (status === "loading" || loading) {
+  if (!mounted || status === "loading" || loading) {
     return <div className="min-h-screen bg-background-primary flex items-center justify-center"><div className="text-text-secondary">Loading...</div></div>;
   }
   if (status === "unauthenticated") return null;

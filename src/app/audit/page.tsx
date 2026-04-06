@@ -21,6 +21,8 @@ interface AuditResult {
 
 export default function AuditPage() {
   const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const router = useRouter();
   const [results, setResults] = useState<AuditResult[]>([]);
   const [loading, setLoading] = useState(true);

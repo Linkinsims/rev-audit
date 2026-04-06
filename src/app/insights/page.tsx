@@ -13,6 +13,8 @@ interface IssueBreakdown { type: string; count: number; total: number; }
 
 export default function InsightsPage() {
   const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const router = useRouter();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [breakdown, setBreakdown] = useState<IssueBreakdown[]>([]);

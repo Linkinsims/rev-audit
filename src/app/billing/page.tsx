@@ -26,6 +26,8 @@ interface BillingRecord {
 
 export default function BillingPage() {
   const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [records, setRecords] = useState<BillingRecord[]>([]);
