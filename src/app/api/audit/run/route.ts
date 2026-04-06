@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { calculateExpectedAmount, determineIssueType } from "@/lib/rule-engine";
-import { Prisma } from "@prisma/client";
+import { IssueType } from "@prisma/client";
 
 export async function POST() {
   const session = await getServerSession(authOptions);
@@ -52,7 +52,7 @@ export async function POST() {
 
       const actualAmount = billingRecord.amountCharged;
       const issueTypeResult = determineIssueType(expectedAmount, actualAmount);
-      const issueType: Prisma.EnumIssueTypeFilter = issueTypeResult || "UNDERCHARGE";
+      const issueType: IssueType = issueTypeResult ?? "UNDERCHARGE";
 
       const detailsJson = {
         calculations: calculations.map(c => ({
@@ -75,7 +75,7 @@ export async function POST() {
           actualAmount,
           difference: expectedAmount - actualAmount,
           issueType,
-          details: detailsJson as Prisma.InputJsonValue,
+          details: detailsJson as unknown as Record<string, unknown>,
         },
       });
 
