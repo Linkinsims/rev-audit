@@ -7,6 +7,8 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Plus, Search, Edit, Trash2, X } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 interface Client {
   id: string;
   name: string;
