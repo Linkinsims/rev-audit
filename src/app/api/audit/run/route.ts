@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { calculateExpectedAmount, determineIssueType } from "@/lib/rule-engine";
-import { IssueType, Prisma } from "@prisma/client";
+import { IssueType } from "@prisma/client";
 
 export async function POST() {
   const session = await getServerSession(authOptions);
@@ -33,7 +33,7 @@ export async function POST() {
     });
 
     for (const billingRecord of billingRecords) {
-      const contractRules: Parameters<typeof calculateExpectedAmount>[0] = [];
+      const contractRules = [];
 
       for (const contract of contracts) {
         const rules = await prisma.contractRule.findMany({
@@ -54,8 +54,8 @@ export async function POST() {
       const issueTypeResult = determineIssueType(expectedAmount, actualAmount);
       const issueType: IssueType = issueTypeResult ?? "UNDERCHARGE";
 
-      const detailsJson: Prisma.InputJsonValue = {
-        calculations: calculations.map(c => ({
+      const detailsJson = {
+        calculations: calculations.map((c: { ruleId: string; ruleName: string; ruleType: string; applied: boolean; expectedAmount: number; details: Record<string, unknown> }) => ({
           ruleId: c.ruleId,
           ruleName: c.ruleName,
           ruleType: c.ruleType,
@@ -75,7 +75,7 @@ export async function POST() {
           actualAmount,
           difference: expectedAmount - actualAmount,
           issueType,
-          details: detailsJson,
+          details: detailsJson as any,
         },
       });
 
