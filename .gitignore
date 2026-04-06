@@ -1,0 +1,14 @@
+node_modules/
+.next/
+.env
+.env.local
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+
+# VS Code installer files (not part of the app)
+Code.exe
+Code.VisualElementsManifest.xml
+unins000.*
+bin/
+e7fb5e96c0/

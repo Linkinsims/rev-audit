@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  clients   Client[]
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  industry  String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contracts Contract[]
+  billings  BillingRecord[]
+  audits   AuditResult[]
+
+  @@index([userId])
+}
+
+model Contract {
+  id          String        @id @default(cuid())
+  clientId    String
+  name        String
+  description String?
+  createdAt   DateTime      @default(now())
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  rules       ContractRule[]
+  audits     AuditResult[]
+
+  @@index([clientId])
+}
+
+model ContractRule {
+  id         String     @id @default(cuid())
+  contractId String
+  type       RuleType
+  name       String
+  condition  Json
+  value      Json
+  priority   Int        @default(0)
+  startDate  DateTime?
+  endDate    DateTime?
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  contract   Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@index([isActive])
+}
+
+model BillingRecord {
+  id             String   @id @default(cuid())
+  clientId       String
+  amountCharged  Float
+  units          Float?
+  description   String?
+  billingDate   DateTime
+  createdAt     DateTime @default(now())
+  client        Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  auditResults  AuditResult[]
+
+  @@index([clientId])
+  @@index([billingDate])
+}
+
+model AuditResult {
+  id               String      @id @default(cuid())
+  clientId         String
+  billingRecordId String?
+  contractId      String?
+  expectedAmount  Float
+  actualAmount    Float
+  difference      Float
+  issueType       IssueType
+  details         Json?
+  createdAt       DateTime     @default(now())
+  client          Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  billingRecord  BillingRecord? @relation(fields: [billingRecordId], references: [id])
+  contract       Contract?    @relation(fields: [contractId], references: [id])
+
+  @@index([clientId])
+  @@index([issueType])
+  @@index([createdAt])
+}
+
+enum RuleType {
+  TIERED
+  FLAT
+  MINIMUM
+  DISCOUNT
+  TIME_BASED_DISCOUNT
+}
+
+enum IssueType {
+  UNDERCHARGE
+  OVERCHARGE
+  MISSED_BILLING
+  EXPIRED_DISCOUNT
+  RULE_VIOLATION
+}
